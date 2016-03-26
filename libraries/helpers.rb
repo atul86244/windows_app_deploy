@@ -1,10 +1,10 @@
  
  module WindowsAppDeploy
   module Helpers
-    def read_manifest( path )
-      require 'rexml/document'
-      include REXML
+    require 'rexml/document'
+    include REXML
 
+    def read_manifest( path )
       xmlfile = File.new(path)
       xmldoc = Document.new(xmlfile)
       msi = []
@@ -28,8 +28,6 @@
     end
 
     def read_registry_name( path, component_name )
-      require 'rexml/document'
-      include REXML
 
       xmlfile = File.new(path)
       xmldoc = Document.new(xmlfile)
@@ -39,3 +37,6 @@
     end
   end
 end
+
+Chef::Recipe.send(:include, WindowsAppDeploy::Helpers)
+Chef::Resource.send(:include, WindowsAppDeploy::Helpers)

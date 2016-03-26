@@ -4,6 +4,8 @@
 #
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
+include_recipe 'windows_app_deploy::install'
+
 # Create the Release folder
 directory node['windows_app_deploy']['release_folder_path'] do
   rights :write, 'Administrator'
