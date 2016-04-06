@@ -35,6 +35,24 @@
       # Extract Registry name for provided component
       XPath.first(xmldoc, "//Component[@Name=\"#{component_name}\"]").attributes["Registry_Name"]
     end
+
+    def get_app_settings( path )
+
+      xmlfile = File.new(path)
+      xmldoc = Document.new(xmlfile)
+      app_settings = []
+
+      # Extract msi path and version
+      XPath.each(xmldoc, "//add[@key]") do |p|
+        key = p.attributes["key"]
+        value = p.attributes["value"]
+        settings = {
+          "key" => "#{key}",
+          "value" => "#{value}"
+        }
+        app_settings.push(settings)  
+      end
+    end
   end
 end
 
