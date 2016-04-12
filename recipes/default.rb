@@ -9,10 +9,10 @@ include_recipe 'windows_app_deploy::install'
 # Create the Release folder
 directory node['windows_app_deploy']['release_folder_path'] do
   rights :write, 'Administrator'
-  action :create
+  action :nothing
   recursive true
   inherits true
-end
+end.run_action(:create)
 
 manifest_location = "#{node['windows_app_deploy']['release_folder_path']}/#{node['windows_app_deploy']['manifest_name']}"
 application_parameter_file_location = "#{node['windows_app_deploy']['release_folder_path']}/File_name"
@@ -21,23 +21,21 @@ application_parameter_file_location = "#{node['windows_app_deploy']['release_fol
 remote_file manifest_location do
   rights :read, 'Administrator'
   source node['windows_app_deploy']['manifest_url']
-end
+  action :nothing
+end.run_action(:create)
 
 # Download the Application Parameter file
 remote_file application_parameter_file_location do
   rights :read, "Administrator"
   source node['windows_app_deploy']['application_parameter_url']
-end
+  action :nothing
+end.run_action(:create)
 
 # Read the manifest and obtain the MSI path and version
-ruby_block 'read_manifest_file' do
-  block do
-	node.default['windows_app_deploy']['msi_data'] = read_manifest(manifest_location)    
-  end
-end
+node.default['windows_app_deploy']['msi_data'] = read_manifest(manifest_location)
 
 # Download MSIs
-lazy { node['windows_app_deploy']['msi_data'] }.each do | msi |
+node['windows_app_deploy']['msi_data'].each do | msi |
 	
 	# Download MSI
 	remote_file "#{node['windows_app_deploy']['release_folder_path']}/#{msi['msi_name']}" do
