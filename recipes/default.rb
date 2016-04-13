@@ -32,10 +32,14 @@ remote_file application_parameter_file_location do
 end.run_action(:create)
 
 # Read the manifest and obtain the MSI path and version
-node.default['windows_app_deploy']['msi_data'] = read_manifest(manifest_location)
+#node.default['windows_app_deploy']['msi_data'] = read_manifest(manifest_location)
+
+msi_data = read_manifest(manifest_location)
+
+puts msi_data
 
 # Download MSIs
-node['windows_app_deploy']['msi_data'].each do | msi |
+msi_data.each do | msi |
 	
 	# Download MSI
 	remote_file "#{node['windows_app_deploy']['release_folder_path']}/#{msi['msi_name']}" do
@@ -48,7 +52,7 @@ node['windows_app_deploy']['msi_data'].each do | msi |
 	  block do
 	    node.run_state['registry_name'] = read_registry_name(application_parameter_file_location, msi['component_name'])
 	    # Get current version number from Registry 
-   		node.run_state['installed_version'] = registry_get_values("HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Tesco\\#{registry_name}", :machine).at(0)[:data]
+   		node.run_state['installed_version'] = registry_get_values("HKEY_LOCAL_MACHINE\\Software\\Wow6432Node\\Tesco\\#{node.run_state['registry_name']}", :machine).at(0)[:data]
 
 		# Compare Version
 		node.run_state['msi_version'] = msi['version']
